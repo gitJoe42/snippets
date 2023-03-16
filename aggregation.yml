@@ -1,0 +1,27 @@
+[
+  { $match: {
+      $or: [ { comesFromPlaner: false }, { comesFromPlaner: { $exists: 0 } } ],
+      $or: [ { isDraft: false }, { isDraft: { $exists: 0 } } ],
+      createdAt: { $gte: ISODate("2023-03-01"), $lt: ISODate("2023-04-01") },
+      title: { $substrBytes: [ "Unser Vorschlag für Ihr Energiesystem", 0, { $strLenBytes: "Unser Vorschlag für Ihr Energiesystem" } ] },
+      "plan.pv.errors": { $exists: 0 },
+      "plan.es.errors": { $exists: 0 },
+      "plan.hp.errors": { $exists: 0 },
+      "offerType": { $exists: 0 }
+    }
+  },
+  { $project:
+    {
+      'ID': { $toString: '$_id' },
+      'Projekt ID': { $toString: '$wegateamProjectId' },
+      'Auftrags-Nr': { $toString: '$offerNumber' },
+      'Nettopreis': { $toString: '$totalNetPrice' },
+      'Craft PV': { $toString: '$request.pv.requested' },
+      'Craft BS': { $toString: '$request.es.requested' },
+      'Craft WP': { $toString: '$request.hp.requested' },
+      'kWp Leistung': { $toString: '$plan.pv.limitedPeakPerformance' },
+      'kWh Kapazität': { $toString: '$plan.es.capacity' },
+      'WP Produkt ID': { $toString: '$plan.hp.heatPump_id' },
+    }
+  }
+]
